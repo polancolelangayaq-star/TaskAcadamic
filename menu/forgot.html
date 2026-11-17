@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lupa Password - TaskAcademic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/register.css">
+</head>
+<body data-on="true" data-color="amber">
+
+    <canvas id="dustCanvas"></canvas>
+    <div class="ambient-glow"></div>
+
+    <div class="scene-container">
+        <div class="form-stage" >
+            <div class="login-card" id="loginCard">
+                <div class="card-header">
+                    <h2 class="card-title">Reset Password</h2>
+                    <p class="card-subtitle">Masukkan username/email terdaftar untuk pemulihan akun</p>
+                </div>
+                
+                <form id="forgot-form">
+                    <div class="form-group">
+                        <label for="forgot-username">Username/Email</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-envelope field-icon"></i>
+                            <input type="text" id="forgot-username" placeholder="Masukkan username atau email Anda" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <div class="btn-glow-layer"></div>
+                        <div class="btn-content">
+                            <span class="btn-text">Kirim Instruksi Reset</span>
+                        </div>
+                    </button>
+                </form>
+
+                <div class="auth-redirect" style="margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+                    <p>Ingat password Anda? <a href="../index.html" style="color: var(--lamp-accent); font-weight: 600; text-decoration: none;">Login di sini</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="../javascript/script.js"></script>
+</body>
+</html>

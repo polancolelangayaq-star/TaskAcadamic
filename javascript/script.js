@@ -25,6 +25,14 @@ function goToLogin() {
     }
 }
 
+function goToForgot() {
+    if (window.location.pathname.includes('/menu/')) {
+        window.location.href = 'forgot.html';
+    } else {
+        window.location.href = 'menu/forgot.html';
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // --- LOGIKA TOMBOL LOGOUT ---
@@ -33,6 +41,33 @@ document.addEventListener("DOMContentLoaded", () => {
       btnLogout.addEventListener("click", () => {
           // Mengarahkan kembali ke halaman utama/login di luar folder menu
           window.location.href = "../index.html";
+      });
+  }
+  
+  // --- LOGIKA TOMBOL LUPA PASSWORD ---
+  const forgotLink = document.getElementById("forgotLink");
+  if (forgotLink) {
+      forgotLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          goToForgot();
+      });
+  }
+
+  const forgotForm = document.getElementById("forgot-form");
+  if (forgotForm) {
+      forgotForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const fUser = document.getElementById("forgot-username").value.trim();
+          
+          let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+          const found = users.find(u => u.username === fUser);
+
+          if (found) {
+              alert(`Simulasi: Instruksi pemulihan password untuk akun "${fUser}" telah dikirim! (Password Anda saat ini adalah: ${found.password})`);
+              window.location.href = "../index.html";
+          } else {
+              alert("Peringatan: Username/Email tidak ditemukan dalam sistem database lokal!");
+          }
       });
   }
   
