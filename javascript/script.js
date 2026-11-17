@@ -63,10 +63,36 @@ document.addEventListener("DOMContentLoaded", () => {
           const found = users.find(u => u.username === fUser);
 
           if (found) {
-              alert(`Simulasi: Instruksi pemulihan password untuk akun "${fUser}" telah dikirim! (Password Anda saat ini adalah: ${found.password})`);
+              alert(` Instruksi pemulihan password untuk akun "${fUser}" telah dikirim!`);
               window.location.href = "../index.html";
           } else {
-              alert("Peringatan: Username/Email tidak ditemukan dalam sistem database lokal!");
+              alert("Peringatan:Email tidak ditemukan dalam sistem database lokal!");
+          }
+      });
+  }
+
+const googleSocialBtn = document.querySelector(".social-btn");
+  if (googleSocialBtn) {
+      googleSocialBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+
+          // Simulasi input email Google pengguna
+          const googleEmail = prompt("Simulasi Login Google\nMasukkan akun Google Anda:");
+
+          if (googleEmail && googleEmail.includes("@")) {
+              let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+              
+              // Cek apakah email sudah terdaftar di localStorage, jika belum, daftarkan otomatis
+              let existingUser = users.find(u => u.username === googleEmail);
+              if (!existingUser) {
+                  users.push({ username: googleEmail, password: "google-oauth-login" });
+                  localStorage.setItem("registeredUsers", JSON.stringify(users));
+              }
+
+              alert(`Berhasil masuk menggunakan akun Google: ${googleEmail}`);
+              goToDashboard();
+          } else if (googleEmail !== null) {
+              alert("Peringatan: Alamat email Google yang dimasukkan tidak valid!");
           }
       });
   }
@@ -101,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Validasi jika kolom kosong
           if (regUser === "" || regPass === "") {
-              alert("Peringatan: Username dan password registrasi tidak boleh kosong!");
+              alert("Peringatan: Email dan password registrasi tidak boleh kosong!");
               return;
           }
 
@@ -111,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Cek apakah username sudah terdaftar
           const existingUser = users.find(u => u.username === regUser);
           if (existingUser) {
-              alert("Peringatan: Username tersebut sudah terdaftar. Silakan gunakan username lain!");
+              alert("Peringatan: Email tersebut sudah terdaftar. Silakan gunakan Email lain!");
               return;
           }
 
@@ -721,7 +747,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const passwordVal = passField.value.trim();
 
           if (usernameVal === "" || passwordVal === "") {
-            alert("Peringatan: Kolom username dan password harus diisi terlebih dahulu!");
+            alert("Peringatan: Kolom Email dan password harus diisi terlebih dahulu!");
             return;
           }
 
@@ -729,7 +755,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const validUser = users.find(u => u.username === usernameVal && u.password === passwordVal);
 
           if (!validUser) {
-            alert("Peringatan: Username atau password salah! Pastikan akun sudah terdaftar melalui menu Register.");
+            alert("Peringatan: Email atau password salah! Pastikan akun sudah terdaftar melalui menu Register.");
             return;
           }
         }
