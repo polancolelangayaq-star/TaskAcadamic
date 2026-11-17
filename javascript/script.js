@@ -1,17 +1,41 @@
-// Fungsi tambahan untuk navigasi
+ // Fungsi Navigasi
 function goToRegister() {
-    window.location.href = 'register.html';
+    // Jika dari index.html (luar), arahkan ke menu/register.html
+    // Jika dari dalam folder menu/, arahkan langsung ke register.html
+    if (window.location.pathname.includes('/menu/')) {
+        window.location.href = 'register.html';
+    } else {
+        window.location.href = 'menu/register.html';
+    }
 }
 
 function goToDashboard() {
-    window.location.href = 'dashboard.html';
+    if (window.location.pathname.includes('/menu/')) {
+        window.location.href = 'dashboard.html';
+    } else {
+        window.location.href = 'menu/dashboard.html';
+    }
 }
 
 function goToLogin() {
-    window.location.href = 'index.html';
+    if (window.location.pathname.includes('/menu/')) {
+        window.location.href = '../index.html';
+    } else {
+        window.location.href = 'index.html';
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  // --- LOGIKA TOMBOL LOGOUT ---
+  const btnLogout = document.getElementById("btn-logout");
+  if (btnLogout) {
+      btnLogout.addEventListener("click", () => {
+          // Mengarahkan kembali ke halaman utama/login di luar folder menu
+          window.location.href = "../index.html";
+      });
+  }
+  
   // --- 1. LOGIKA HALAMAN REGISTER ---
   const registerForm = document.getElementById("register-form");
   
@@ -62,8 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           alert("Registrasi Berhasil! Silakan login menggunakan akun yang baru saja didaftarkan.");
           
-          // PINDAH KE HALAMAN LOGIN SECARA OTOMATIS
-          window.location.href = "index.html"; 
+          window.location.href = "../index.html";
       });
       
       // Jika berada di halaman register, hentikan eksekusi skrip lampu login di bawah agar tidak error
