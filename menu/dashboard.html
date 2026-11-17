@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TaskAcademic</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Jalur CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<!-- Tambahkan data-on="true" dan data-color="amber" agar efek cahaya aktif -->
+<body data-on="true" data-color="amber">
+
+    <!-- Canvas Partikel Debu Cahaya yang Bercahaya -->
+    <canvas id="dustCanvas"></canvas>
+
+    <!-- Ambient Glow Latar Belakang Ruangan -->
+    <div class="ambient-glow"></div>
+
+    <div class="room-stage">
+        <div class="form-stage" style="width: 100%; max-width: 100%; padding: 10px 30px;">
+            <div class="app-container" id="loginCard" style="opacity: 1; transform: none; width: 100%;">
+                <!-- Header -->
+                <header class="app-header">
+                    <div class="header-top">
+                        <div class="logo">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <h2>TaskAcademic</h2>
+                        </div>
+                        <button id="btn-logout" class="btn-logout" title="Keluar Akun" onclick="window.location.href='index.html'">
+                         <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </button>
+                    </div>
+                    <p class="subtitle">Kelola deadline & tugas harianmu dengan mudah</p>
+                    
+                    <button id="btn-enable-notify" class="btn-notify">
+                        <i class="fa-solid fa-bell"></i> Aktifkan Notifikasi Browser
+                    </button>
+                </header>
+
+                <!-- Main Dashboard Grid -->
+                <main class="dashboard-grid">
+                    
+                    <!-- Form Input -->
+                    <section class="card form-section">
+                        <h3><i class="fa-solid fa-square-plus"></i> Tambah Tugas Baru</h3>
+                        <form id="task-form">
+                            <div class="form-group">
+                                <label for="category">Mata Kuliah</label>
+                                <input type="text" id="category" placeholder="Contoh: Dasar Pemrograman Web" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="judul">Judul / Deskripsi Tugas</label>
+                                <input type="text" id="judul" placeholder="Contoh: Pengembangan WEB" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="deadline">Target Tanggal</label>
+                                <input type="date" id="deadline" required>
+                            </div>
+
+                            <button type="submit" class="btn-primary">
+                                <i class="fa-solid fa-plus"></i> Simpan Tugas
+                            </button>
+                        </form>
+                    </section>
+
+                    <!-- Daftar Agenda -->
+                    <section class="card list-section">
+                        <div class="list-header">
+                            <h3><i class="fa-solid fa-list-check"></i> Daftar Tugas Harian</h3>
+                            <div class="stats-badge" id="task-count">0 Agenda</div>
+                        </div>
+
+                        <!-- Filter Status -->
+                        <div class="filter-group">
+                            <button class="filter-btn active" data-filter="all">Semua</button>
+                            <button class="filter-btn" data-filter="pending">Belum Selesai</button>
+                            <button class="filter-btn" data-filter="completed">Selesai</button>
+                        </div>
+
+                        <!-- List Task -->
+                        <div class="task-list" id="task-list"></div>
+                    </section>
+
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jalur JavaScript & GSAP (agar partikel debu & animasi berjalan) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="../javascript/script.js"></script>
+</body>
+</html>
