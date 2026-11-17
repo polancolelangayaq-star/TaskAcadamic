@@ -149,9 +149,7 @@ const googleSocialBtn = document.querySelector(".social-btn");
           
           window.location.href = "../index.html";
       });
-      
-      // Jika berada di halaman register, hentikan eksekusi skrip lampu login di bawah agar tidak error
-      return; 
+       
   }
 
   // --- 2. LOGIKA DASHBOARD & MANAJEMEN TUGAS ---
