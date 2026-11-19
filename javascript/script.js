@@ -31,6 +31,16 @@ function goToForgot() {
     }
 }
 
+// --- HELPER PENYIMPANAN DATA PER AKUN ---
+function getActiveUserKey() {
+    const activeUser = (localStorage.getItem("activeUser") || "").trim().toLowerCase();
+    return activeUser || "guest";
+}
+
+function getUserTasksStorageKey() {
+    return `academicTasks_${encodeURIComponent(getActiveUserKey())}`;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
 
@@ -54,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnLogout = document.getElementById("btn-logout");
     if (btnLogout) {
         btnLogout.addEventListener("click", () => {
+            localStorage.removeItem("activeUser");
             goToLogin();
         });
     }
@@ -100,15 +111,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const googleEmail = prompt("Simulasi Login Google\nMasukkan akun Google Anda:");
 
             if (googleEmail && googleEmail.includes("@")) {
+                const cleanEmail = googleEmail.trim();
                 const users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
-                const existingUser = users.find(u => u.username === googleEmail.trim());
+                const existingUser = users.find(u => u.username === cleanEmail);
 
                 if (!existingUser) {
-                    users.push({ username: googleEmail.trim(), password: "google-oauth-login" });
+                    users.push({ username: cleanEmail, password: "google-oauth-login" });
                     localStorage.setItem("registeredUsers", JSON.stringify(users));
                 }
 
-                alert(`Berhasil masuk menggunakan akun Google: ${googleEmail.trim()}`);
+                // Set akun aktif sebelum masuk ke dashboard
+                localStorage.setItem("activeUser", cleanEmail);
+
+                alert(`Berhasil masuk menggunakan akun Google: ${cleanEmail}`);
                 goToDashboard();
             } else if (googleEmail !== null) {
                 alert("Peringatan: Alamat email Google yang dimasukkan tidak valid!");
@@ -156,10 +171,14 @@ document.addEventListener("DOMContentLoaded", () => {
             users.push({ username: regUser, password: regPass });
             localStorage.setItem("registeredUsers", JSON.stringify(users));
 
-            // Simpan pesan untuk ditampilkan juga di halaman login
+            // Siapkan ruang tugas kosong khusus akun baru ini
+            const newUserTasksKey = `academicTasks_${encodeURIComponent(regUser.toLowerCase())}`;
+            if (!localStorage.getItem(newUserTasksKey)) {
+                localStorage.setItem(newUserTasksKey, JSON.stringify([]));
+            }
+
             sessionStorage.setItem("registerSuccessMsg", "Akun berhasil didaftarkan! Silakan masuk menggunakan akun Anda.");
 
-            // Tampilkan pesan singkat di halaman register sebelum pindah otomatis
             let registerStatus = document.getElementById("registerStatus");
             if (!registerStatus) {
                 registerStatus = document.createElement("p");
@@ -179,9 +198,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 2. LOGIKA DASHBOARD & MANAJEMEN TUGAS (DASHBOARD.HTML) ---
+    // --- 2. LOGIKA DASHBOARD & MANAJEMEN TUGAS PER AKUN (DASHBOARD.HTML) ---
     const taskForm = document.getElementById("task-form");
     if (taskForm) {
+        const activeUser = localStorage.getItem("activeUser");
+        if (!activeUser) {
+            // Jika belum login, arahkan kembali ke halaman login
+            goToLogin();
+            return;
+        }
+
+        const storageKey = getUserTasksStorageKey();
         const categoryInput = document.getElementById("category");
         const judulInput = document.getElementById("judul");
         const deadlineInput = document.getElementById("deadline");
@@ -189,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const taskCountBadge = document.getElementById("task-count");
         const filterButtons = document.querySelectorAll(".filter-btn");
 
-        let tasks = JSON.parse(localStorage.getItem("academicTasks")) || [];
+        let tasks = JSON.parse(localStorage.getItem(storageKey)) || [];
         let currentFilter = "all";
 
         function renderTasks() {
@@ -203,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (filteredTasks.length === 0) {
-                taskListContainer.innerHTML = `<p style="text-align: center; color: #888; padding: 20px;">Belum ada tugas yang ditambahkan.</p>`;
+                taskListContainer.innerHTML = `<p style="text-align: center; color: #888; padding: 20px;">Belum ada tugas untuk akun <b>${activeUser}</b>.</p>`;
             } else {
                 filteredTasks.forEach((task) => {
                     const taskCard = document.createElement("div");
@@ -232,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (taskCountBadge) {
                 taskCountBadge.textContent = `${tasks.length} Agenda`;
             }
-            localStorage.setItem("academicTasks", JSON.stringify(tasks));
+            localStorage.setItem(storageKey, JSON.stringify(tasks));
         }
 
         taskForm.addEventListener("submit", (e) => {
@@ -249,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tasks.push(newTask);
             renderTasks();
             taskForm.reset();
-            alert("Tugas berhasil disimpan!");
+            alert("Tugas berhasil disimpan untuk akun ini!");
         });
 
         filterButtons.forEach(btn => {
@@ -803,6 +830,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("Peringatan: Email atau password salah! Pastikan akun sudah terdaftar melalui menu Register.");
                     return;
                 }
+
+                // Simpan akun yang sedang login agar dashboard memuat data khusus akun ini
+                localStorage.setItem("activeUser", validUser.username);
             }
 
             if (!isOn) {
