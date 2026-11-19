@@ -1346,12 +1346,100 @@ body::before {
 .btn-check:hover { background: #2ed573; color: white; border-color: #2ed573; }
 .btn-delete:hover { background: #ff3838; color: white; border-color: #ff3838; }
 
-/* Responsif untuk tablet/HP */
-@media (max-width: 480px) {
+/* === RESPONSIVE: TABLET & LAPTOP KECIL (<= 900px) === */
+@media (max-width: 900px) {
+    .form-stage {
+        padding: 6px 8px;
+    }
+
     .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
+
     .task-list {
-        max-height: 400px;
+        max-height: 450px;
+    }
+}
+
+/* === RESPONSIVE: HP / MOBILE (<= 576px) === */
+@media (max-width: 576px) {
+    body {
+        padding: 10px;
+    }
+
+    .room-stage {
+        min-height: calc(100vh - 20px);
+    }
+
+    .form-stage {
+        padding: 0;
+    }
+
+    .app-container {
+        padding: 18px 14px;
+        border-radius: 16px;
+        gap: 16px;
+    }
+
+    .logo {
+        gap: 8px;
+    }
+
+    .logo i {
+        font-size: 1.45rem;
+    }
+
+    .logo h2 {
+        font-size: 1.35rem;
+    }
+
+    .btn-logout {
+        padding: 8px 12px;
+        font-size: 0.82rem;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .btn-notify {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.82rem;
+    }
+
+    .card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .card h3 {
+        font-size: 1.05rem;
+    }
+
+    .list-header {
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        flex: 1;
+        text-align: center;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .task-actions {
+        width: 100%;
+        justify-content: flex-end;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding-top: 10px;
     }
 }
