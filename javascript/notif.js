@@ -125,11 +125,137 @@
             } else {
                 alert("Nada notifikasi bawaan diaktifkan (izin notifikasi browser belum diberikan).");
             }
+
+            // Langsung cek deadline H-2 / H-1 saat notifikasi diaktifkan
+            checkUpcomingDeadlines();
+        }
+    }
+
+    // --- PENGINGAT OTOMATIS DEADLINE H-2 & H-1 ---
+    function getActiveUserKey() {
+        const activeUser = (localStorage.getItem("activeUser") || "").trim().toLowerCase();
+        return activeUser || "guest";
+    }
+
+    function getUserTasks() {
+        const key = `academicTasks_${encodeURIComponent(getActiveUserKey())}`;
+        try {
+            return JSON.parse(localStorage.getItem(key)) || [];
+        } catch (err) {
+            return [];
+        }
+    }
+
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    function getDaysRemaining(deadlineStr) {
+        if (!deadlineStr) return null;
+
+        const parts = String(deadlineStr).split("-");
+        let targetDate;
+        if (parts.length === 3) {
+            targetDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        } else {
+            const parsed = new Date(deadlineStr);
+            if (Number.isNaN(parsed.getTime())) return null;
+            targetDate = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+        }
+
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        const diffMs = targetDate.getTime() - today.getTime();
+        return Math.round(diffMs / (1000 * 60 * 60 * 24));
+    }
+
+    function showInPageBanner(message, isUrgent) {
+        let container = document.getElementById("deadlineAlertContainer");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "deadlineAlertContainer";
+            container.style.cssText =
+                "position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 360px;";
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement("div");
+        const borderColor = isUrgent ? "#ff5252" : "#ff9800";
+        const bgColor = isUrgent ? "rgba(60, 18, 24, 0.95)" : "rgba(58, 38, 12, 0.95)";
+        toast.style.cssText = `background: ${bgColor}; border-left: 4px solid ${borderColor}; color: #fff; padding: 12px 14px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); font-size: 0.88rem; line-height: 1.4;`;
+        toast.innerHTML = `<div style="font-weight: 600; margin-bottom: 4px;">Pengingat Deadline Tugas</div><div>${message}</div>`;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            toast.style.transition = "opacity 0.3s ease";
+            setTimeout(() => toast.remove(), 300);
+        }, 7000);
+    }
+
+    function triggerDeadlineReminder(task, daysLeft) {
+        const label = daysLeft === 1 ? "H-1 (Besok)" : "H-2 (2 hari lagi)";
+        const title = `Pengingat Tugas (${label})`;
+        const bodyText = `"${task.judul}" [${task.category || "Umum"}] — Deadline: ${task.deadline}`;
+
+        if (localStorage.getItem(STORAGE_KEY) === "true") {
+            playDefaultNotificationSound();
+        }
+
+        if ("Notification" in window && Notification.permission === "granted") {
+            try {
+                new Notification(title, { body: bodyText });
+            } catch (err) {
+                console.warn("Gagal menampilkan sistem notifikasi:", err);
+            }
+        }
+
+        showInPageBanner(`<strong>${label}:</strong> ${bodyText}`, daysLeft === 1);
+    }
+
+    function checkUpcomingDeadlines() {
+        const tasks = getUserTasks();
+        if (!tasks.length) return;
+
+        const todayStr = getTodayDateString();
+        const sentKey = `notifiedDeadlines_${encodeURIComponent(getActiveUserKey())}_${todayStr}`;
+        let sentIds = [];
+        try {
+            sentIds = JSON.parse(localStorage.getItem(sentKey)) || [];
+        } catch (err) {
+            sentIds = [];
+        }
+
+        let updated = false;
+
+        tasks.forEach((task) => {
+            if (!task || task.completed) return;
+
+            const daysLeft = getDaysRemaining(task.deadline);
+            if (daysLeft === 2 || daysLeft === 1) {
+                const uniqueTag = `${task.id}_H${daysLeft}`;
+                if (!sentIds.includes(uniqueTag)) {
+                    triggerDeadlineReminder(task, daysLeft);
+                    sentIds.push(uniqueTag);
+                    updated = true;
+                }
+            }
+        });
+
+        if (updated) {
+            localStorage.setItem(sentKey, JSON.stringify(sentIds));
         }
     }
 
     // Ekspos fungsi ke window bila ingin dipanggil dari tempat lain
     window.playDefaultNotificationSound = playDefaultNotificationSound;
+    window.checkUpcomingDeadlines = checkUpcomingDeadlines;
 
     document.addEventListener("DOMContentLoaded", () => {
         const buttons = findNotificationButtons();
@@ -138,11 +264,17 @@
         buttons.forEach((btn) => {
             updateButtonLabel(btn, savedEnabled);
             btn.addEventListener("click", (e) => {
-                // Jangan ganggu jika berada di dalam form submit yang bukan tombol aksi mandiri
                 if (btn.getAttribute("type") === "submit") return;
                 e.preventDefault();
                 handleEnableNotification(btn);
             });
         });
+
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission().catch(() => {});
+        }
+
+        checkUpcomingDeadlines();
+        setInterval(checkUpcomingDeadlines, 5 * 60 * 1000);
     });
 })();
